@@ -1,16 +1,14 @@
+# render.yaml
 services:
   - type: web
     name: mayo-clinic-portal
     env: node
     plan: free
-    region: ohio  # or your preferred region
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 3000
       - key: MONGODB_URI
         fromSecret: MONGODB_URI
       - key: JWT_SECRET

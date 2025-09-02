@@ -1,29 +1,14 @@
 {
-  "name": "mayo-clinic-medical-portal",
+  "name": "mayo-clinic-medical-portal-backend",
   "version": "1.0.0",
-  "description": "Mayo Clinic Medical Portal - Full-stack application for patient reviews and services",
-  "main": "backend/server.js",
+  "description": "Backend for Mayo Clinic Medical Portal",
+  "main": "server.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js",
-    "build": "echo 'Building Mayo Clinic Portal...' && npm install",
-    "render-build": "npm install",
-    "test": "jest --testTimeout=10000",
-    "test:watch": "jest --watch --testTimeout=10000",
-    "lint": "eslint backend/ frontend/",
-    "lint:fix": "eslint backend/ frontend/ --fix"
+     "start": "node backend/server.js",
+    "dev": "nodemon server.js",
+    "build": "echo 'No build step needed for Node.js'",
+    "render-build": "npm install"
   },
-  "keywords": [
-    "medical",
-    "portal",
-    "healthcare",
-    "reviews",
-    "nodejs",
-    "express",
-    "mongodb"
-  ],
-  "author": "Mayo Clinic Development Team",
-  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "mongoose": "^7.5.0",
@@ -31,30 +16,9 @@
     "jsonwebtoken": "^9.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "express-rate-limit": "^6.10.0",
-    "helmet": "^7.0.0",
-    "express-mongo-sanitize": "^2.2.0",
-    "compression": "^1.7.4",
-    "express-validator": "^7.0.1"
+    "express-rate-limit": "^6.10.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1",
-    "jest": "^29.6.4",
-    "supertest": "^6.3.3",
-    "eslint": "^8.48.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.28.1"
-  },
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/your-username/mayo-clinic-portal.git"
-  },
-  "bugs": {
-    "url": "https://github.com/your-username/mayo-clinic-portal/issues"
-  },
-  "homepage": "https://github.com/your-username/mayo-clinic-portal#readme"
+    "nodemon": "^3.0.1"
+  }
 }

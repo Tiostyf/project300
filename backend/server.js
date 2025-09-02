@@ -1,3 +1,4 @@
+// backend/server.js
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -5,64 +6,31 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs'); // Added fs module
 const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
-      fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"]
-    }
-  }
-}));
-app.use(mongoSanitize());
-
-// MongoDB Atlas connection with improved options
+// MongoDB Atlas connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/mayo-clinic', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000,
-});
-
-mongoose.connection.on('connected', () => {
-  console.log('Connected to MongoDB successfully');
-});
-
-mongoose.connection.on('error', (err) => {
-  console.error('MongoDB connection error:', err);
 });
 
 // User Schema
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: true, trim: true },
-  email: { 
-    type: String, 
-    required: true, 
-    unique: true, 
-    lowercase: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
-  },
-  password: { type: String, required: true, minlength: 6 },
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
   createdAt: { type: Date, default: Date.now }
 });
 
 // Review Schema
 const reviewSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  name: { type: String, required: true, trim: true },
+  name: { type: String, required: true },
   image: { type: String },
-  description: { type: String, required: true, maxlength: 500 },
+  description: { type: String, required: true },
   rating: { type: Number, min: 1, max: 5, required: true },
   createdAt: { type: Date, default: Date.now }
 });
@@ -70,112 +38,43 @@ const reviewSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 const Review = mongoose.model('Review', reviewSchema);
 
-// Rate limiting - stricter for auth endpoints
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // limit each IP to 5 requests per windowMs for auth
-  message: 'Too many authentication attempts, please try again later.',
-  skipSuccessfulRequests: true
-});
-
-const generalLimiter = rateLimit({
+// Rate limiting
+const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100 // limit each IP to 100 requests per windowMs
 });
-
-// Apply rate limiting
-app.use('/api/register', authLimiter);
-app.use('/api/login', authLimiter);
-app.use(generalLimiter);
-
-// CORS configuration for production
-const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL || 'http://localhost:3000' 
-    : '*',
-  optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
+app.use(limiter);
 
 // Middleware
+app.use(cors());
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
-
-// Serve static files from frontend directory with error handling
-const frontendPath = path.join(__dirname, 'frontend');
-try {
-  if (fs.existsSync(frontendPath)) {
-    app.use(express.static(frontendPath, {
-      maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0'
-    }));
-    console.log('Frontend static files served successfully');
-  } else {
-    console.log('Frontend directory not found - running in API-only mode');
-  }
-} catch (error) {
-  console.log('Error serving static files:', error.message);
-}
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 // JWT verification middleware
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) {
-    return res.status(401).json({ error: 'Access token required' });
-  }
+  if (!token) return res.sendStatus(401);
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ error: 'Invalid or expired token' });
-    }
+  jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret', (err, user) => {
+    if (err) return res.sendStatus(403);
     req.user = user;
     next();
   });
 };
 
-// Input validation middleware
-const validateRegistration = (req, res, next) => {
-  const { name, email, password } = req.body;
-  
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: 'All fields are required' });
-  }
-  
-  if (password.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters' });
-  }
-  
-  next();
-};
-
-const validateReview = (req, res, next) => {
-  const { name, description, rating } = req.body;
-  
-  if (!name || !description || !rating) {
-    return res.status(400).json({ error: 'Name, description, and rating are required' });
-  }
-  
-  if (rating < 1 || rating > 5) {
-    return res.status(400).json({ error: 'Rating must be between 1 and 5' });
-  }
-  
-  next();
-};
-
 // Routes
-app.post('/api/register', validateRegistration, async (req, res) => {
+app.post('/api/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
     
     // Check if user exists
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({ error: 'User already exists' });
-    }
+    if (existingUser) return res.status(400).json({ error: 'User already exists' });
     
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(password, 10);
     
     // Create user
     const user = new User({ name, email, password: hashedPassword });
@@ -184,19 +83,13 @@ app.post('/api/register', validateRegistration, async (req, res) => {
     // Generate JWT
     const token = jwt.sign(
       { userId: user._id, email: user.email },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'fallback_secret',
       { expiresIn: '24h' }
     );
     
-    res.status(201).json({ 
-      token, 
-      userId: user._id, 
-      name: user.name,
-      message: 'Registration successful' 
-    });
+    res.status(201).json({ token, userId: user._id, name: user.name });
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ error: 'Registration failed. Please try again.' });
+    res.status(500).json({ error: 'Registration failed' });
   }
 });
 
@@ -204,165 +97,72 @@ app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
-    
     // Find user
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
+    if (!user) return res.status(400).json({ error: 'Invalid credentials' });
     
     // Check password
     const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
+    if (!validPassword) return res.status(400).json({ error: 'Invalid credentials' });
     
     // Generate JWT
     const token = jwt.sign(
       { userId: user._id, email: user.email },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'fallback_secret',
       { expiresIn: '24h' }
     );
     
-    res.json({ 
-      token, 
-      userId: user._id, 
-      name: user.name,
-      message: 'Login successful' 
-    });
+    res.json({ token, userId: user._id, name: user.name });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Login failed. Please try again.' });
+    res.status(500).json({ error: 'Login failed' });
   }
 });
 
-app.post('/api/reviews', authenticateToken, validateReview, async (req, res) => {
+app.post('/api/reviews', authenticateToken, async (req, res) => {
   try {
     const { name, image, description, rating } = req.body;
-    
     const review = new Review({
       userId: req.user.userId,
       name,
-      image: image || '',
+      image,
       description,
       rating
     });
     
     await review.save();
-    
-    // Populate the review with user data for response
-    const populatedReview = await Review.findById(review._id).populate('userId', 'name email');
-    
-    res.status(201).json({ 
-      message: 'Review submitted successfully',
-      review: populatedReview 
-    });
+    res.status(201).json({ message: 'Review submitted successfully' });
   } catch (error) {
-    console.error('Review submission error:', error);
     res.status(500).json({ error: 'Failed to submit review' });
   }
 });
 
 app.get('/api/reviews', async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-    
-    const reviews = await Review.find()
-      .populate('userId', 'name')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-    
-    const total = await Review.countDocuments();
-    
-    res.json({
-      reviews,
-      currentPage: page,
-      totalPages: Math.ceil(total / limit),
-      totalReviews: total
-    });
+    const reviews = await Review.find().sort({ createdAt: -1 }).limit(10);
+    res.json(reviews);
   } catch (error) {
-    console.error('Fetch reviews error:', error);
     res.status(500).json({ error: 'Failed to fetch reviews' });
   }
 });
 
-// Health check endpoint for deployment
-app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    mode: fs.existsSync(frontendPath) ? 'full-stack' : 'api-only'
-  });
-});
-
 // Protected route check
 app.get('/api/verify', authenticateToken, (req, res) => {
-  res.json({ 
-    valid: true, 
-    user: req.user,
-    message: 'Token is valid' 
-  });
+  res.json({ valid: true, user: req.user });
 });
 
-// Serve frontend pages with authentication check (only if frontend exists)
-if (fs.existsSync(frontendPath)) {
-  app.get(['/home', '/service', '/review'], authenticateToken, (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-
-  // Serve static files without authentication
-  app.get(['/', '/register', '/login'], (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-
-  // Fallback to index.html for client-side routing
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-} else {
-  // API-only mode routes when frontend doesn't exist
-  app.get('/', (req, res) => {
-    res.json({ 
-      message: 'Mayo Clinic Medical Portal API',
-      status: 'API-only mode',
-      endpoints: {
-        auth: ['POST /api/register', 'POST /api/login'],
-        reviews: ['GET /api/reviews', 'POST /api/reviews (protected)'],
-        health: 'GET /health'
-      }
-    });
-  });
-}
-
-// 404 handler for API routes
-app.use('/api/*', (req, res) => {
-  res.status(404).json({ error: 'API endpoint not found' });
+// Serve frontend pages with authentication check
+app.get(['/home', '/service', '/review'], authenticateToken, (req, res) => {
+  const requestedPage = req.path.substring(1); // Remove leading slash
+  res.sendFile(path.join(__dirname, `../frontend/${requestedPage}.html`));
 });
 
-// Global error handler
-app.use((error, req, res, next) => {
-  console.error('Unhandled error:', error);
-  res.status(500).json({ error: 'Internal server error' });
-});
-
-// Graceful shutdown handling
-process.on('SIGINT', async () => {
-  console.log('Shutting down gracefully...');
-  await mongoose.connection.close();
-  process.exit(0);
+// Serve static files without authentication
+app.get(['/', '/register', '/login'], (req, res) => {
+  const page = req.path === '/' ? 'index' : req.path.substring(1);
+  res.sendFile(path.join(__dirname, `../frontend/${page}.html`));
 });
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
-  console.log(`Frontend mode: ${fs.existsSync(frontendPath) ? 'serving static files' : 'API-only'}`);
+  console.log(`Server running on port ${PORT}`);
 });
-
-module.exports = app; // For testing
