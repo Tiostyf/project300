@@ -2,16 +2,16 @@
   "name": "mayo-clinic-medical-portal",
   "version": "1.0.0",
   "description": "Mayo Clinic Medical Portal - Full-stack application for patient reviews and services",
-  "main": "backend/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
     "build": "echo 'Building Mayo Clinic Portal...' && npm install",
     "render-build": "npm install",
     "test": "jest --testTimeout=10000",
     "test:watch": "jest --watch --testTimeout=10000",
-    "lint": "eslint backend/ frontend/",
-    "lint:fix": "eslint backend/ frontend/ --fix"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "keywords": [
     "medical",
