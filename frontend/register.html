@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Mayo Clinic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional modern styles that won't affect the original styles.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #0066cc 0%, #004d99 100%);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 10px 30px rgba(0, 102, 204, 0.2);
+        }
+
+        header h1 {
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 2.2rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        #registerForm {
+            background: white;
+            padding: 30px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #0066cc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.2);
+            outline: none;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 42px;
+            color: #0066cc;
+            font-size: 18px;
+        }
+
+        .password-rules {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .password-rules ul {
+            padding-left: 20px;
+            margin-top: 5px;
+        }
+
+        .password-rules li {
+            margin-bottom: 3px;
+        }
+
+        .password-rules .valid {
+            color: #10b981;
+        }
+
+        .password-rules .invalid {
+            color: #ef4444;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #0066cc 0%, #004d99 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.4);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #64748b;
+        }
+
+        .form-footer a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .form-footer a:hover {
+            color: #004d99;
+            text-decoration: underline;
+            transform: translateY(-1px);
+        }
+
+        .form-footer p {
+            margin-bottom: 12px;
+        }
+
+        .terms {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .terms label {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .terms input[type="checkbox"] {
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        .terms a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        .terms a:hover {
+            text-decoration: underline;
+        }
+
+        #message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            header {
+                padding: 25px 20px;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            #registerForm {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Create an Account</h1>
+            <p>Join Mayo Clinic's patient portal</p>
+        </header>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="name"><i class="fas fa-user"></i> Full Name</label>
+                <i class="fas fa-user input-icon"></i>
+                <input type="text" id="name" required placeholder="Enter your full name">
+            </div>
+            
+            <div class="form-group">
+                <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                <i class="fas fa-envelope input-icon"></i>
+                <input type="email" id="email" required placeholder="Enter your email address">
+            </div>
+            
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Password</label>
+                <i class="fas fa-lock input-icon"></i>
+                <input type="password" id="password" required placeholder="Create a strong password">
+                <div class="password-rules">
+                    <p>Password must include:</p>
+                    <ul>
+                        <li class="invalid" id="length-rule">At least 8 characters</li>
+                        <li class="invalid" id="uppercase-rule">One uppercase letter</li>
+                        <li class="invalid" id="number-rule">One number</li>
+                        <li class="invalid" id="special-rule">One special character</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="terms">
+                <label>
+                    <input type="checkbox" required>
+                    <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I consent to receiving communications from Mayo Clinic regarding my account and healthcare services.</span>
+                </label>
+            </div>
+            
+            <button type="submit"><i class="fas fa-user-plus"></i> Register</button>
+        </form>
+        
+        <div class="form-footer">
+            <p>Already have an account? <a href="login.html">Login here</a></p>
+            <p><a href="index.html"><i class="fas fa-arrow-left"></i> Back to Home</a></p>
+        </div>
+        
+        <div id="message" class="hidden"></div>
+    </div>
+    <script>
+        // Password validation (client-side only, doesn't interfere with app.js)
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password');
+            const lengthRule = document.getElementById('length-rule');
+            const uppercaseRule = document.getElementById('uppercase-rule');
+            const numberRule = document.getElementById('number-rule');
+            const specialRule = document.getElementById('special-rule');
+            
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    const password = passwordInput.value;
+                    
+                    // Check length
+                    if (password.length >= 8) {
+                        lengthRule.classList.remove('invalid');
+                        lengthRule.classList.add('valid');
+                    } else {
+                        lengthRule.classList.remove('valid');
+                        lengthRule.classList.add('invalid');
+                    }
+                    
+                    // Check uppercase
+                    if (/[A-Z]/.test(password)) {
+                        uppercaseRule.classList.remove('invalid');
+                        uppercaseRule.classList.add('valid');
+                    } else {
+                        uppercaseRule.classList.remove('valid');
+                        uppercaseRule.classList.add('invalid');
+                    }
+                    
+                    // Check number
+                    if (/[0-9]/.test(password)) {
+                        numberRule.classList.remove('invalid');
+                        numberRule.classList.add('valid');
+                    } else {
+                        numberRule.classList.remove('valid');
+                        numberRule.classList.add('invalid');
+                    }
+                    
+                    // Check special character
+                    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                        specialRule.classList.remove('invalid');
+                        specialRule.classList.add('valid');
+                    } else {
+                        specialRule.classList.remove('valid');
+                        specialRule.classList.add('invalid');
+                    }
+                });
+            }
+        });
+    </script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - Mayo Clinic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9fafb;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #0066cc 0%, #004d99 100%);
+            color: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 102, 204, 0.2);
+        }
+
+        header h1 {
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: #004d99;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0 0;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .dashboard-card {
+            background-color: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 20px;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-title {
+            color: #0066cc;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #004d99;
+            margin: 10px 0;
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            color: #28a745;
+            font-weight: 500;
+        }
+
+        .stat-change.negative {
+            color: #dc3545;
+        }
+
+        .chart-container {
+            height: 250px;
+            margin-top: 15px;
+        }
+
+        .patient-list {
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .patient-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .patient-item:last-child {
+            border-bottom: none;
+        }
+
+        .patient-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+
+        .patient-info {
+            flex: 1;
+        }
+
+        .patient-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .patient-condition {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .patient-time {
+            font-size: 0.9rem;
+            color: #0066cc;
+            font-weight: 500;
+        }
+
+        .features-section {
+            margin: 50px 0;
+            padding: 40px 0;
+            background: linear-gradient(to right, #f7f9fc, #f1f6ff);
+            border-radius: 16px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #0066cc;
+            font-weight: 700;
+            font-size: 2rem;
+        }
+
+        .appointment-cta {
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, #0066cc 0%, #004d99 100%);
+            color: white;
+            border-radius: 16px;
+            margin: 40px 0;
+        }
+
+        .appointment-cta h2 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+        }
+
+        .appointment-cta p {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            background: white;
+            color: #0066cc;
+            font-weight: 600;
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            display: inline-block;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            background: #f0f6ff;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            background-color: #e9ecef;
+            border-radius: 12px;
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            nav {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Doctor Dashboard</h1>
+            <p>Real-time patient data and analytics</p>
+            <nav>
+                <a href="home.html" class="active"><i class="fas fa-user-md"></i> Dashboard</a>
+                <a href="service.html"><i class="fas fa-stethoscope"></i> Services</a>
+                <a href="review.html"><i class="fas fa-star"></i> Reviews</a>
+                <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </nav>
+        </header>
+        
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <h3 class="card-title"><i class="fas fa-heartbeat"></i> Heart Rate</h3>
+                <div class="stat-value" id="heartRate">72</div>
+                <div class="stat-change" id="heartRateChange">
+                    <i class="fas fa-arrow-up"></i> <span>2 bpm</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="heartRateChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3 class="card-title"><i class="fas fa-lungs"></i> Blood Pressure</h3>
+                <div class="stat-value" id="bloodPressure">120/80</div>
+                <div class="stat-change">
+                    <i class="fas fa-minus"></i> <span>Stable</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="bpChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3 class="card-title"><i class="fas fa-thermometer-half"></i> Temperature</h3>
+                <div class="stat-value" id="temperature">98.6°F</div>
+                <div class="stat-change">
+                    <i class="fas fa-arrow-down"></i> <span>0.2°F</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="tempChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <h3 class="card-title"><i class="fas fa-procedures"></i> Recent Patients</h3>
+                <div class="patient-list">
+                    <div class="patient-item">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80" alt="Patient" class="patient-avatar">
+                        <div class="patient-info">
+                            <div class="patient-name">Robert Johnson</div>
+                            <div class="patient-condition">Hypertension</div>
+                        </div>
+                        <div class="patient-time">10:30 AM</div>
+                    </div>
+                    <div class="patient-item">
+                        <img src="https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80" alt="Patient" class="patient-avatar">
+                        <div class="patient-info">
+                            <div class="patient-name">Nancy Wilson</div>
+                            <div class="patient-condition">Diabetes Check</div>
+                        </div>
+                        <div class="patient-time">11:15 AM</div>
+                    </div>
+                    <div class="patient-item">
+                        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80" alt="Patient" class="patient-avatar">
+                        <div class="patient-info">
+                            <div class="patient-name">Sandra Miller</div>
+                            <div class="patient-condition">Post-op Follow-up</div>
+                        </div>
+                        <div class="patient-time">1:45 PM</div>
+                    </div>
+                    <div class="patient-item">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80" alt="Patient" class="patient-avatar">
+                        <div class="patient-info">
+                            <div class="patient-name">Michael Brown</div>
+                            <div class="patient-condition">Cardiology Consultation</div>
+                        </div>
+                        <div class="patient-time">3:20 PM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-section">
+            <h2 class="section-title">Real-time Health Metrics</h2>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <h3 class="card-title"><i class="fas fa-walking"></i> Activity Level</h3>
+                    <div class="chart-container">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3 class="card-title"><i class="fas fa-bed"></i> Sleep Patterns</h3>
+                    <div class="chart-container">
+                        <canvas id="sleepChart"></canvas>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3 class="card-title"><i class="fas fa-prescription-bottle"></i> Medication Adherence</h3>
+                    <div class="stat-value">92%</div>
+                    <div class="chart-container">
+                        <canvas id="medicationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="appointment-cta">
+            <h2>Patient Health Status Alert</h2>
+            <p>Monitor your patients' health metrics in real-time and receive instant notifications for any critical changes.</p>
+            <a href="#" class="cta-button">View Patient Details</a>
+        </div>
+        
+        <footer>
+            <p>© 2023 Mayo Clinic. All rights reserved. | Real-time Data Dashboard</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize charts
+        const initCharts = () => {
+            // Heart Rate Chart
+            const heartRateCtx = document.getElementById('heartRateChart').getContext('2d');
+            const heartRateChart = new Chart(heartRateCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 20}, (_, i) => i + 1),
+                    datasets: [{
+                        label: 'BPM',
+                        data: Array.from({length: 20}, () => Math.floor(Math.random() * 20) + 65),
+                        borderColor: '#dc3545',
+                        tension: 0.4,
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false },
+                        x: { display: false }
+                    }
+                }
+            });
+
+            // Blood Pressure Chart
+            const bpCtx = document.getElementById('bpChart').getContext('2d');
+            const bpChart = new Chart(bpCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 20}, (_, i) => i + 1),
+                    datasets: [
+                        {
+                            label: 'Systolic',
+                            data: Array.from({length: 20}, () => Math.floor(Math.random() * 30) + 110),
+                            borderColor: '#0066cc',
+                            tension: 0.4,
+                            fill: false,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Diastolic',
+                            data: Array.from({length: 20}, () => Math.floor(Math.random() * 20) + 70),
+                            borderColor: '#6c757d',
+                            tension: 0.4,
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false },
+                        x: { display: false }
+                    }
+                }
+            });
+
+            // Temperature Chart
+            const tempCtx = document.getElementById('tempChart').getContext('2d');
+            const tempChart = new Chart(tempCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 20}, (_, i) => i + 1),
+                    datasets: [{
+                        label: '°F',
+                        data: Array.from({length: 20}, () => (Math.random() * 2) + 97.5),
+                        borderColor: '#28a745',
+                        tension: 0.4,
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false },
+                        x: { display: false }
+                    }
+                }
+            });
+
+            // Activity Chart
+            const activityCtx = document.getElementById('activityChart').getContext('2d');
+            const activityChart = new Chart(activityCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Steps (thousands)',
+                        data: [8.2, 7.5, 9.8, 6.5, 10.2, 5.3, 12.1],
+                        backgroundColor: '#0066cc'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Sleep Chart
+            const sleepCtx = document.getElementById('sleepChart').getContext('2d');
+            const sleepChart = new Chart(sleepCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Deep', 'Light', 'REM', 'Awake'],
+                    datasets: [{
+                        data: [25, 45, 20, 10],
+                        backgroundColor: ['#0066cc', '#004d99', '#003366', '#6c757d']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            return { heartRateChart, bpChart, tempChart };
+        };
+
+        // Initialize charts
+        const charts = initCharts();
+
+        // Simulate real-time data updates
+        setInterval(() => {
+            // Update heart rate
+            const newHeartRate = Math.floor(Math.random() * 20) + 65;
+            document.getElementById('heartRate').textContent = newHeartRate;
+            
+            // Update heart rate change indicator
+            const changeElement = document.getElementById('heartRateChange');
+            const change = Math.floor(Math.random() * 5) - 2;
+            changeElement.innerHTML = change >= 0 ? 
+                `<i class="fas fa-arrow-up"></i> <span>${change} bpm</span>` : 
+                `<i class="fas fa-arrow-down"></i> <span>${Math.abs(change)} bpm</span>`;
+            
+            // Update charts with new data
+            charts.heartRateChart.data.datasets[0].data.push(newHeartRate);
+            charts.heartRateChart.data.datasets[0].data.shift();
+            charts.heartRateChart.update('none');
+            
+            // Update BP chart
+            charts.bpChart.data.datasets[0].data.push(Math.floor(Math.random() * 30) + 110);
+            charts.bpChart.data.datasets[0].data.shift();
+            charts.bpChart.data.datasets[1].data.push(Math.floor(Math.random() * 20) + 70);
+            charts.bpChart.data.datasets[1].data.shift();
+            charts.bpChart.update('none');
+            
+            // Update temperature chart
+            charts.tempChart.data.datasets[0].data.push((Math.random() * 2) + 97.5);
+            charts.tempChart.data.datasets[0].data.shift();
+            charts.tempChart.update('none');
+        }, 2000);
+
+        // Logout button functionality
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            alert('Logout successful!');
+        });
+    </script>
+</body>
+</html>

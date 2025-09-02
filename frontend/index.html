@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mayo Clinic - World-Class Healthcare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional modern styles that won't affect the original styles.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 30px;
+            background: linear-gradient(135deg, #0066cc 0%, #004d99 100%);
+            color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 102, 204, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.05"><circle cx="50" cy="50" r="40" stroke="white" stroke-width="2" fill="none" /><path d="M20,20 L80,80 M80,20 L20,80" stroke="white" stroke-width="2" /></svg>');
+            background-size: 100px;
+            opacity: 0.1;
+        }
+
+        header h1 {
+            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 2.8rem;
+            position: relative;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .auth-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .auth-buttons button {
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-buttons button:first-child {
+            background: linear-gradient(135deg, #0066cc 0%, #004d99 100%);
+            color: white;
+        }
+
+        .auth-buttons button:last-child {
+            background: white;
+            color: #0066cc;
+            border: 2px solid #0066cc;
+        }
+
+        .auth-buttons button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+
+        .feature {
+            padding: 30px;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #0066cc, #004d99);
+        }
+
+        .feature:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #0066cc;
+            margin-bottom: 20px;
+        }
+
+        .feature h3 {
+            color: #0066cc;
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 1.4rem;
+        }
+
+        .feature p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .testimonials {
+            background: linear-gradient(to right, #f7f9fc, #f1f6ff);
+            padding: 50px 30px;
+            border-radius: 20px;
+            margin: 50px 0;
+            text-align: center;
+        }
+
+        .testimonials h2 {
+            color: #0066cc;
+            margin-bottom: 40px;
+            font-size: 2.2rem;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .testimonial {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: left;
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .author-details h4 {
+            color: #0066cc;
+            margin-bottom: 5px;
+        }
+
+        .author-details p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .press-section {
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .press-section h2 {
+            color: #0066cc;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .press-logos {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .press-logo {
+            height: 40px;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+            filter: grayscale(100%);
+        }
+
+        .press-logo:hover {
+            opacity: 1;
+            filter: grayscale(0%);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            background-color: #e9ecef;
+            border-radius: 16px;
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            .features, .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .auth-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            header p {
+                font-size: 1rem;
+            }
+            
+            .press-logos {
+                gap: 25px;
+            }
+            
+            .press-logo {
+                height: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mayo Clinic – Rochester, USA</h1>
+            <p>Consistently ranked #1, Mayo Clinic stands out for its exceptional patient outcomes, pioneering treatments, and sustained excellence</p>
+        </header>
+        
+        <div class="auth-buttons">
+            <button onclick="location.href='register.html'"><i class="fas fa-user-plus"></i> Register</button>
+            <button onclick="location.href='login.html'"><i class="fas fa-sign-in-alt"></i> Login</button>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h3>Expert Doctors</h3>
+                <p>Access to world-renowned medical professionals with decades of experience and specialized expertise.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+                <h3>Advanced Services</h3>
+                <p>Cutting-edge medical treatments and technologies that set new standards in healthcare excellence.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3>Patient Reviews</h3>
+                <p>See what our patients say about their experience and the life-changing care they received.</p>
+            </div>
+        </div>
+        
+        <div class="testimonials">
+            <h2>Patient Success Stories</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial">
+                    <p class="testimonial-text">"The care I received at Mayo Clinic was exceptional. The doctors took the time to explain everything and made me feel like I was their only patient."</p>
+                    <div class="testimonial-author">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80" alt="John Davis" class="testimonial-avatar">
+                        <div class="author-details">
+                            <h4>John Davis</h4>
+                            <p>Cardiac Patient</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <p class="testimonial-text">"After being misdiagnosed elsewhere, Mayo Clinic found the root cause of my condition. I'm forever grateful for their expertise and compassion."</p>
+                    <div class="testimonial-author">
+                        <img src="https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80" alt="Sarah Miller" class="testimonial-avatar">
+                        <div class="author-details">
+                            <h4>Sarah Miller</h4>
+                            <p>Oncology Patient</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <p class="testimonial-text">"The collaborative approach at Mayo Clinic meant that multiple specialists worked together on my case. The results were life-changing."</p>
+                    <div class="testimonial-author">
+                        <img src="https://images.unsplash.com/photo-1567532939604-b6b5b0db1604?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&q=80" alt="Robert Wilson" class="testimonial-avatar">
+                        <div class="author-details">
+                            <h4>Robert Wilson</h4>
+                            <p>Neurology Patient</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="press-section">
+            <h2>As Featured In</h2>
+            <div class="press-logos">
+                <img src="https://placehold.co/200x60/0066cc/white?text=GlobeNewswire" alt="GlobeNewswire" class="press-logo">
+                <img src="https://placehold.co/200x60/0066cc/white?text=New+York+Post" alt="New York Post" class="press-logo">
+                <img src="https://placehold.co/200x60/0066cc/white?text=Wikipedia" alt="Wikipedia" class="press-logo">
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Mayo Clinic. All rights reserved. | Consistently ranked #1 in the nation</p>
+        </footer>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

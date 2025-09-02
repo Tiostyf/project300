@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Services - Mayo Clinic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh; color: #333; line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        header {
+            text-align: center; margin-bottom: 40px; padding: 30px;
+            background: linear-gradient(135deg, #0066cc 0%, #004d99 100%);
+            color: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 102, 204, 0.2);
+        }
+        header h1 { margin-bottom: 10px; font-size: 2.5rem; }
+        header p { font-size: 1.2rem; opacity: 0.9; margin-bottom: 20px; }
+        
+        nav {
+            display: flex; justify-content: center; gap: 15px; margin: 25px 0 0; flex-wrap: wrap;
+        }
+        nav a {
+            text-decoration: none; color: white; padding: 12px 20px; border-radius: 8px;
+            transition: all 0.3s; font-weight: 500; display: flex; align-items: center; gap: 8px;
+        }
+        nav a:hover, nav a.active { background-color: rgba(255, 255, 255, 0.2); transform: translateY(-2px); }
+        
+        #logoutBtn {
+            padding: 12px 24px; background-color: rgba(255, 255, 255, 0.2); color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 8px; cursor: pointer;
+            font-size: 16px; transition: all 0.3s; font-weight: 500; display: flex; 
+            align-items: center; gap: 8px;
+        }
+        #logoutBtn:hover { background-color: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+        
+        .services-list {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px;
+            margin-bottom: 40px;
+        }
+        .service-item {
+            background: white; padding: 25px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s; text-align: center; border-left: 5px solid #0066cc;
+        }
+        .service-item:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12); }
+        
+        .service-icon {
+            font-size: 3rem; color: #0066cc; margin-bottom: 20px;
+        }
+        .service-item h3 { color: #0066cc; margin-bottom: 15px; font-size: 1.4rem; }
+        .service-item p { color: #555; margin-bottom: 20px; }
+        
+        .service-stats {
+            display: flex; justify-content: center; gap: 20px; margin-top: 15px;
+            padding-top: 15px; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 0.9rem;
+        }
+        .stat { display: flex; align-items: center; gap: 5px; }
+        
+        /* Demo Doctors Section */
+        .doctors-section {
+            margin: 50px 0;
+            padding: 30px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #0066cc;
+            font-size: 2rem;
+        }
+        .doctors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .doctor-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s;
+            border-bottom: 3px solid #0066cc;
+        }
+        .doctor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .doctor-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            border: 3px solid #0066cc;
+        }
+        .doctor-card h4 {
+            color: #0066cc;
+            margin-bottom: 5px;
+        }
+        .doctor-specialty {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .services-list, .doctors-grid { grid-template-columns: 1fr; }
+            nav { flex-direction: column; align-items: center; gap: 10px; }
+            header h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Medical Services & Specialties</h1>
+            <p>Comprehensive healthcare services at Mayo Clinic</p>
+            <nav>
+                <a href="home.html"><i class="fas fa-user-md"></i> Doctors</a>
+                <a href="service.html" class="active"><i class="fas fa-stethoscope"></i> Services</a>
+                <a href="review.html"><i class="fas fa-star"></i> Reviews</a>
+                <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </nav>
+        </header>
+        
+        <div class="services-list">
+            <div class="service-item">
+                <div class="service-icon"><i class="fas fa-heart"></i></div>
+                <h3>Cardiology</h3>
+                <p>Comprehensive heart and vascular care with cutting-edge treatments</p>
+                <div class="service-stats">
+                    <span class="stat"><i class="fas fa-user-md"></i> 24 Specialists</span>
+                    <span class="stat"><i class="fas fa-calendar-check"></i> 3 Days Wait</span>
+                </div>
+            </div>
+            
+            <div class="service-item">
+                <div class="service-icon"><i class="fas fa-dna"></i></div>
+                <h3>Oncology</h3>
+                <p>Advanced cancer diagnosis, treatment, and supportive care</p>
+                <div class="service-stats">
+                    <span class="stat"><i class="fas fa-user-md"></i> 18 Specialists</span>
+                    <span class="stat"><i class="fas fa-calendar-check"></i> 5 Days Wait</span>
+                </div>
+            </div>
+            
+            <div class="service-item">
+                <div class="service-icon"><i class="fas fa-brain"></i></div>
+                <h3>Neurology</h3>
+                <p>Expert care for disorders of the brain and nervous system</p>
+                <div class="service-stats">
+                    <span class="stat"><i class="fas fa-user-md"></i> 15 Specialists</span>
+                    <span class="stat"><i class="fas fa-calendar-check"></i> 2 Days Wait</span>
+                </div>
+            </div>
+            
+            <div class="service-item">
+                <div class="service-icon"><i class="fas fa-bone"></i></div>
+                <h3>Orthopedics</h3>
+                <p>Specialized care for bones, joints, and musculoskeletal conditions</p>
+                <div class="service-stats">
+                    <span class="stat"><i class="fas fa-user-md"></i> 22 Specialists</span>
+                    <span class="stat"><i class="fas fa-calendar-check"></i> 4 Days Wait</span>
+                </div>
+            </div>
+            
+            <div class="service-item">
+                <div class="service-icon"><i class="fas fa-ambulance"></i></div>
+                <h3>Emergency Medicine</h3>
+                <p>24/7 emergency care for critical and urgent health issues</p>
+                <div class="service-stats">
+                    <span class="stat"><i class="fas fa-user-md"></i> 30 Specialists</span>
+                    <span class="stat"><i class="fas fa-clock"></i> Immediate Care</span>
+                </div>
+            </div>
+            
+            <div class="service-item">
+                <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>Preventive Medicine</h3>
+                <p>Health screenings and preventive care to maintain wellness</p>
+                <div class="service-stats">
+                    <span class="stat"><i class="fas fa-user-md"></i> 12 Specialists</span>
+                    <span class="stat"><i class="fas fa-calendar-check"></i> 1 Day Wait</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Demo Doctors Section -->
+        <div class="doctors-section">
+            <h2 class="section-title">Our Specialist Doctors</h2>
+            <div class="doctors-grid">
+                <div class="doctor-card">
+                    <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Dr. John Smith" class="doctor-image">
+                    <h4>Dr. John Smith</h4>
+                    <p class="doctor-specialty">Cardiology</p>
+                    <p>20+ years experience</p>
+                </div>
+                
+                <div class="doctor-card">
+                    <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Dr. Sarah Johnson" class="doctor-image">
+                    <h4>Dr. Sarah Johnson</h4>
+                    <p class="doctor-specialty">Oncology</p>
+                    <p>18+ years experience</p>
+                </div>
+                
+                <div class="doctor-card">
+                    <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Dr. Michael Williams" class="doctor-image">
+                    <h4>Dr. Michael Williams</h4>
+                    <p class="doctor-specialty">Neurology</p>
+                    <p>22+ years experience</p>
+                </div>
+                
+                <div class="doctor-card">
+                    <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d15?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Dr. Emily Brown" class="doctor-image">
+                    <h4>Dr. Emily Brown</h4>
+                    <p class="doctor-specialty">Pediatrics</p>
+                    <p>15+ years experience</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Simple logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            alert('Logout successful!');
+        });
+    </script>
+</body>
+</html>

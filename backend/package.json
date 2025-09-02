@@ -1,0 +1,24 @@
+{
+  "name": "mayo-clinic-medical-portal-backend",
+  "version": "1.0.0",
+  "description": "Backend for Mayo Clinic Medical Portal",
+  "main": "server.js",
+  "scripts": {
+     "start": "node backend/server.js",
+    "dev": "nodemon server.js",
+    "build": "echo 'No build step needed for Node.js'",
+    "render-build": "npm install"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express-rate-limit": "^6.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
