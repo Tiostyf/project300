@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs'); // Added fs module
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
@@ -100,10 +101,20 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from frontend directory
-app.use(express.static(path.join(__dirname, 'frontend'), {
-  maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0'
-}));
+// Serve static files from frontend directory with error handling
+const frontendPath = path.join(__dirname, 'frontend');
+try {
+  if (fs.existsSync(frontendPath)) {
+    app.use(express.static(frontendPath, {
+      maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0'
+    }));
+    console.log('Frontend static files served successfully');
+  } else {
+    console.log('Frontend directory not found - running in API-only mode');
+  }
+} catch (error) {
+  console.log('Error serving static files:', error.message);
+}
 
 // JWT verification middleware
 const authenticateToken = (req, res, next) => {
@@ -286,7 +297,8 @@ app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    mode: fs.existsSync(frontendPath) ? 'full-stack' : 'api-only'
   });
 });
 
@@ -299,24 +311,39 @@ app.get('/api/verify', authenticateToken, (req, res) => {
   });
 });
 
-// Serve frontend pages with authentication check
-app.get(['/home', '/service', '/review'], authenticateToken, (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
-});
+// Serve frontend pages with authentication check (only if frontend exists)
+if (fs.existsSync(frontendPath)) {
+  app.get(['/home', '/service', '/review'], authenticateToken, (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
 
-// Serve static files without authentication
-app.get(['/', '/register', '/login'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
-});
+  // Serve static files without authentication
+  app.get(['/', '/register', '/login'], (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+
+  // Fallback to index.html for client-side routing
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+} else {
+  // API-only mode routes when frontend doesn't exist
+  app.get('/', (req, res) => {
+    res.json({ 
+      message: 'Mayo Clinic Medical Portal API',
+      status: 'API-only mode',
+      endpoints: {
+        auth: ['POST /api/register', 'POST /api/login'],
+        reviews: ['GET /api/reviews', 'POST /api/reviews (protected)'],
+        health: 'GET /health'
+      }
+    });
+  });
+}
 
 // 404 handler for API routes
 app.use('/api/*', (req, res) => {
   res.status(404).json({ error: 'API endpoint not found' });
-});
-
-// Fallback to index.html for client-side routing
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
 // Global error handler
@@ -335,6 +362,7 @@ process.on('SIGINT', async () => {
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
+  console.log(`Frontend mode: ${fs.existsSync(frontendPath) ? 'serving static files' : 'API-only'}`);
 });
 
 module.exports = app; // For testing
