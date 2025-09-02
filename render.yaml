@@ -3,12 +3,108 @@ services:
     name: mayo-clinic-portal
     env: node
     plan: free
-    buildCommand: npm install
-    startCommand: node backend/server.js
+    region: us-east  # Specify region for better performance
+    buildCommand: npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true  # Automatically deploy on git push
+    
+    # Environment variables
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 3000
+      - key: FRONTEND_URL
+        value: https://mayo-clinic-portal.onrender.com  # Update with your actual URL
+    
+    # Secrets (should be set in your deployment platform)
+    envSecrets:
       - key: MONGODB_URI
         fromSecret: MONGODB_URI
       - key: JWT_SECRET
         fromSecret: JWT_SECRET
+      - key: JWT_EXPIRES_IN
+        value: 24h  # Optional: JWT expiration time
+    
+    # Advanced configuration
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
+    
+    # Resource limits (if free plan has limits)
+    resources:
+      memoryMB: 512
+      cpuUnits: 256
+
+# Database service (if using managed database)
+databases:
+  - name: mayo-clinic-db
+    plan: free
+    type: mongodb
+    version: 6.0
+
+# Build and deployment hooks
+build:
+  image: node:18-alpine  # Specify Node version
+  commands:
+    - npm ci --only=production --no-audit --no-fund
+    - echo "Build completed successfully"
+
+deploy:
+  preDeployCommands:
+    - echo "Starting deployment process..."
+  postDeployCommands:
+    - echo "Running post-deployment checks..."
+    - npm run test  # Run tests if available
+
+# Health checks
+healthChecks:
+  - name: app-health
+    path: /health
+    initialDelay: 30
+    period: 60
+    timeout: 10
+    successThreshold: 1
+    failureThreshold: 3
+
+# Environment-specific configurations
+environments:
+  - name: production
+    envVars:
+      - key: LOG_LEVEL
+        value: info
+      - key: CORS_ORIGIN
+        value: https://mayo-clinic-portal.onrender.com
+    
+  - name: staging
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: staging
+      - key: MONGODB_URI
+        fromSecret: MONGODB_URI_STAGING
+      - key: CORS_ORIGIN
+        value: https://staging-mayo-clinic-portal.onrender.com
+    autoDeploy: true
+    branch: develop  # Deploy staging from develop branch
+
+# Custom domains (if applicable)
+domains:
+  - name: mayo-clinic.example.com  # Replace with your domain
+    environment: production
+  - name: staging.mayo-clinic.example.com
+    environment: staging
+
+# Notifications (optional)
+notifications:
+  - type: email
+    events: [deploy_succeeded, deploy_failed]
+    config:
+      email: admin@example.com  # Replace with your email
+  - type: slack
+    events: [deploy_started, deploy_succeeded, deploy_failed]
+    config:
+      channel: deployments
+      webhook: $SLACK_WEBHOOK  # Set as secret
